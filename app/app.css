@@ -1,0 +1,942 @@
+@import "tailwindcss";
+
+@theme {
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+        "Noto Color Emoji";
+}
+
+
+/* ------------------------------
+   Box Sizing
+------------------------------ */
+
+* {
+    box-sizing: border-box;
+}
+
+
+/* ------------------------------
+   Base
+------------------------------ */
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+
+    font-family: var(--font-sans);
+
+    background: #f4f5f7;
+    color: #202124;
+}
+
+
+/* ------------------------------
+   App
+------------------------------ */
+
+.app {
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* ------------------------------
+   Header
+------------------------------ */
+
+.header {
+    height: 76px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 28px;
+
+    background: white;
+    border-bottom: 1px solid #ddd;
+}
+
+.header h1 {
+    margin: 0;
+
+    font-size: 22px;
+}
+
+.header p {
+    margin: 3px 0 0;
+
+    color: #777;
+
+    font-size: 13px;
+}
+
+
+/* ------------------------------
+   Energy
+------------------------------ */
+
+.energy-display {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 8px 16px;
+
+    border: 1px solid #ddd;
+    border-radius: 8px;
+
+    background: #fafafa;
+}
+
+.energy-display span {
+    color: #777;
+
+    font-size: 13px;
+}
+
+.energy-display strong {
+    font-size: 20px;
+}
+
+
+/* ------------------------------
+   Main Layout
+------------------------------ */
+
+.layout {
+    flex: 1;
+
+    display: grid;
+
+    grid-template-columns: 340px 1fr;
+
+    min-height: 0;
+}
+
+
+/* ------------------------------
+   Sidebar
+------------------------------ */
+
+.sidebar {
+    padding: 20px;
+
+    background: white;
+
+    border-right: 1px solid #ddd;
+
+    overflow-y: auto;
+}
+
+.panel {
+    margin-bottom: 18px;
+
+    padding-bottom: 18px;
+
+    border-bottom: 1px solid #ddd;
+}
+
+.panel h2 {
+    margin: 0 0 14px;
+
+    font-size: 16px;
+}
+
+.panel-heading {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 8px;
+
+    margin-bottom: 10px;
+}
+
+.panel-heading h2 {
+    margin: 0;
+}
+
+
+/* ------------------------------
+   Inputs
+------------------------------ */
+
+label {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+
+    margin-bottom: 13px;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+input,
+select {
+    width: 100%;
+
+    padding: 8px 9px;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    background: white;
+
+    font: inherit;
+}
+
+select {
+    cursor: pointer;
+}
+
+
+/* ------------------------------
+   Buttons
+------------------------------ */
+
+button {
+    font: inherit;
+
+    cursor: pointer;
+}
+
+
+/* ------------------------------
+   Primary Button
+------------------------------ */
+
+.primary-button {
+    width: 100%;
+
+    padding: 9px 10px;
+
+    border: 0;
+    border-radius: 6px;
+
+    background: #202124;
+
+    color: white;
+
+    font-weight: 600;
+}
+
+.primary-button:hover {
+    background: #3c4043;
+}
+
+.primary-button:disabled {
+    opacity: 0.4;
+
+    cursor: not-allowed;
+}
+
+
+/* ------------------------------
+   Secondary Button
+------------------------------ */
+
+.secondary-button {
+    width: 100%;
+
+    padding: 9px 10px;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    background: white;
+
+    font-weight: 600;
+}
+
+.secondary-button:hover {
+    background: #f5f5f5;
+}
+
+
+/* ------------------------------
+   Configuration Cards
+------------------------------ */
+
+.polymer-editor {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+
+/* ------------------------------
+   Polymer Card
+------------------------------ */
+
+.polymer-card {
+    padding: 10px;
+
+    background: white;
+
+    border: 1px solid #dfe3e8;
+    border-radius: 9px;
+
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.polymer-card-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 9px;
+}
+
+.polymer-card-header h3 {
+    margin: 0;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.polymer-card-header span {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #6b7280;
+
+    font-size: 10px;
+}
+
+
+/* ------------------------------
+   Monomer Cards
+------------------------------ */
+
+.monomer-cards {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+
+    margin-bottom: 7px;
+}
+
+.monomer-card {
+    display: grid;
+
+    grid-template-columns:
+        45px
+        minmax(0, 1fr)
+        24px;
+
+    gap: 5px;
+
+    align-items: center;
+
+    padding: 5px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 7px;
+}
+
+.monomer-card input {
+    width: 100%;
+    min-width: 0;
+
+    padding: 5px 6px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+
+    font-size: 11px;
+}
+
+.monomer-card .name-input {
+    font-weight: 600;
+}
+
+.monomer-card .domains-input {
+    font-family: monospace;
+}
+
+
+/* ------------------------------
+   Delete Button
+------------------------------ */
+
+.delete-button {
+    width: 24px;
+    height: 24px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 0;
+    border-radius: 50%;
+
+    background: transparent;
+
+    color: #888;
+
+    font-size: 16px;
+    line-height: 1;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+.delete-button:hover {
+    background: #fee2e2;
+
+    color: #dc2626;
+}
+
+
+/* ------------------------------
+   Add Polymer
+------------------------------ */
+
+.add-polymer {
+    width: auto;
+    height: 30px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 5px 9px;
+
+    border: 1px dashed #cbd5e1;
+    border-radius: 7px;
+
+    background: transparent;
+
+    color: #64748b;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    white-space: nowrap;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.add-polymer:hover {
+    background: #f8fafc;
+
+    border-color: #94a3b8;
+
+    color: #334155;
+}
+
+
+/* ------------------------------
+   Add Monomer
+------------------------------ */
+
+.add-monomer {
+    width: 100%;
+    height: 30px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 5px;
+
+    border: 1px dashed #cbd5e1;
+    border-radius: 7px;
+
+    background: transparent;
+
+    color: #64748b;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.add-monomer:hover {
+    background: #f8fafc;
+
+    border-color: #94a3b8;
+
+    color: #334155;
+}
+
+
+/* ------------------------------
+   Configuration Actions
+------------------------------ */
+
+.configuration-actions {
+    display: flex;
+
+    gap: 7px;
+
+    margin-top: 12px;
+    padding-top: 12px;
+
+    border-top: 1px solid #e5e7eb;
+}
+
+.configuration-actions .primary-button {
+    flex: 1;
+}
+
+.configuration-actions .secondary-button {
+    width: auto;
+
+    padding-left: 14px;
+    padding-right: 14px;
+
+    margin-top: 0;
+}
+
+
+/* ------------------------------
+   Move Counters
+------------------------------ */
+
+.move-count {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 8px;
+
+    font-size: 13px;
+}
+
+.move-count strong {
+    padding: 2px 8px;
+
+    border-radius: 20px;
+
+    background: #eee;
+}
+
+.sidebar .primary-button {
+    margin-top: 10px;
+}
+
+
+/* ------------------------------
+   Simulation Area
+------------------------------ */
+
+.simulation-area {
+    min-width: 0;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* ------------------------------
+   Board Toolbar
+------------------------------ */
+
+.board-toolbar {
+    height: 60px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 24px;
+
+    background: white;
+
+    border-bottom: 1px solid #ddd;
+}
+
+.board-toolbar > div {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+.board-toolbar span {
+    color: #777;
+
+    font-size: 13px;
+}
+
+.toolbar-buttons {
+    gap: 7px !important;
+}
+
+.toolbar-buttons button {
+    padding: 7px 12px;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    background: white;
+
+    font-size: 12px;
+}
+
+.toolbar-buttons button:hover {
+    background: #f5f5f5;
+}
+
+/* =================================
+   BOARD
+================================= */
+
+.board {
+    flex: 1;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    align-items: flex-start;
+
+    gap: 20px;
+
+    padding: 30px;
+
+    overflow: auto;
+
+    background: #f4f5f7;
+}
+
+
+/* =================================
+   POLYMER CARD
+================================= */
+
+.board .polymer-card {
+    width: fit-content;
+    max-width: 510px;
+    height: fit-content;
+
+    border: 2px dotted #4d4a4a;
+    border-radius: 14px;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+
+/* Polymer header */
+
+.board .polymer-card .card-header {
+    background: white;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    border-radius: 12px 12px 0 0;
+}
+
+.board .polymer-card h5 {
+    font-size: 16px;
+}
+
+
+/* Polymer body ONLY */
+
+.board > .polymer-card > .card-body {
+    display: flex;
+    flex-wrap: wrap;
+
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    gap: 10px;
+
+    width: fit-content;
+    padding: 10px;
+}
+
+
+/* =================================
+   MONOMERS
+================================= */
+
+.board .polymer-card .monomer-card {
+    display: flex;
+    flex-direction: column;
+
+    flex: 0 0 auto;
+
+    width: fit-content;
+    height: fit-content;
+
+    background: #f8fafc;
+
+    border: 1px solid #dfe4eb;
+    border-radius: 10px;
+
+    box-shadow: none;
+}
+
+
+/* Monomer body ONLY */
+
+.board .polymer-card .monomer-card > .card-body {
+    display: flex;
+    flex-direction: column;
+
+    flex: 0 0 auto;
+
+    width: fit-content;
+    max-width: 100%;
+
+    gap: 8px;
+
+    padding: 10px;
+    padding-bottom: 1px;
+}
+
+
+/* =================================
+   MONOMER NAME
+================================= */
+
+.board .monomer-name {
+    padding-top: 6px;
+
+    border-top: 1px solid #e5e7eb;
+
+    text-align: center;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* =================================
+   DOMAINS
+================================= */
+
+.board .domains {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    width: fit-content;
+    max-width: 250px;
+}
+
+
+/* =================================
+   DOMAIN
+================================= */
+
+.board .domain {
+    display: flex;
+
+    align-items: center;
+
+    width: fit-content;
+
+    padding: 5px 7px;
+
+    gap: 7px;
+
+    border-radius: 6px;
+
+    font-size: 12px;
+}
+
+.board .domain strong {
+    font-weight: 600;
+}
+
+
+/* =================================
+   POSITIVE DOMAIN
+================================= */
+
+.board .positive-domain {
+    background: #eaf7ee;
+
+    border: 1px solid #c8e8d1;
+}
+
+
+/* =================================
+   NEGATIVE DOMAIN
+================================= */
+
+.board .negative-domain {
+    background: #fcecec;
+
+    border: 1px solid #f0caca;
+}
+
+
+/* =================================
+   RESPONSIVE
+================================= */
+
+@media (max-width: 900px) {
+
+    .board {
+        padding: 20px;
+    }
+}
+
+
+/* ------------------------------
+   Valid Moves
+------------------------------ */
+
+.moves-panel {
+    padding: 20px 28px;
+
+    background: white;
+
+    border-top: 1px solid #ddd;
+}
+
+.moves-panel h2 {
+    margin: 0 0 12px;
+
+    font-size: 15px;
+}
+
+.move-list {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    max-height: 170px;
+
+    overflow-y: auto;
+}
+
+.move-card {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 8px 12px;
+
+    border: 1px solid #ccc;
+    border-radius: 7px;
+
+    background: white;
+
+    font-size: 12px;
+}
+
+.move-card:hover {
+    background: #f5f5f5;
+}
+
+.move-type {
+    padding: 2px 5px;
+
+    border-radius: 4px;
+
+    background: #eee;
+
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.negative {
+    color: #167c32;
+}
+
+.positive {
+    color: #b42318;
+}
+
+.no-moves {
+    color: #777;
+
+    font-size: 13px;
+}
+
+/* ------------------------------ Collapsible Panel ------------------------------ */ 
+.collapse-button {
+     display: flex; 
+     align-items: center; 
+     gap: 5px; 
+     padding: 0; 
+     border: 0; 
+     background: transparent; 
+     color: inherit; cursor: pointer; 
+    } 
+     
+.collapse-button h2 { 
+    margin: 0; 
+} 
+.collapse-icon { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    width: 18px; 
+    height: 18px; 
+    font-size: 18px; 
+    line-height: 1; 
+    transform: rotate(0deg); 
+    transition: transform 0.15s ease; 
+} 
+.collapse-icon.open { 
+    transform: rotate(90deg); 
+} 
+.collapse-button:hover h2 { 
+    color: #555; 
+}
+/* ------------------------------
+   Responsive
+------------------------------ */
+
+@media (max-width: 900px) {
+
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        border-right: 0;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .board {
+        min-height: 500px;
+    }
+}
