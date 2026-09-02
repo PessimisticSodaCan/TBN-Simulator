@@ -1304,17 +1304,18 @@ function PolymerView({ polymer }) {
 
       <div className="card-body">
 
-        {[...polymer.monomers.values()].map(
-          (monomer) => (
+        <div className="polymers">
+          {[...polymer.monomers.values()].map(
+            (monomer) => (
 
-            <MonomerView
-              key={monomer.name}
-              monomer={monomer}
-            />
+              <MonomerView
+                key={monomer.name}
+                monomer={monomer}
+              />
 
-          )
-        )}
-
+            )
+          )}
+        </div>
       </div>
 
     </div>

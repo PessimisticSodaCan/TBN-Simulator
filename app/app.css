@@ -704,7 +704,6 @@ button {
 
 .board .polymer-card {
     width: fit-content;
-
     max-width: 510px;
 
     height: fit-content;
@@ -731,12 +730,14 @@ button {
     font-size: 16px;
 }
 
-
-/* Polymer body ONLY */
-
 .board > .polymer-card > .card-body {
-    display: flex;
+    width: fit-content;
+    padding: 10px;
+}
 
+.board > .polymer-card .polymers {
+    display: flex;
+    
     flex-wrap: wrap;
 
     align-items: flex-start;
@@ -745,9 +746,9 @@ button {
     gap: 10px;
 
     width: fit-content;
-
-    padding: 10px;
+    max-width: 510px;
 }
+
 
 
 /* =================================
@@ -758,7 +759,6 @@ button {
     display: flex;
 
     flex-direction: column;
-
     flex: 0 0 auto;
 
     width: fit-content;
@@ -772,22 +772,15 @@ button {
     box-shadow: none;
 }
 
-
-/* Monomer body ONLY */
-
 .board .polymer-card .monomer-card > .card-body {
     display: flex;
 
     flex-direction: column;
-
     flex: 0 0 auto;
 
     width: fit-content;
 
-    max-width: 100%;
-
     gap: 8px;
-
     padding: 10px;
 
     padding-bottom: 1px;
