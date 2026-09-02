@@ -126,11 +126,10 @@ export function Simulator() {
       }
 
       setPolymersConfig(configuration);
-      setInitialConfigOpen(true);
+      setInitialConfigOpen(false);
       setDomainInputs({});
       setConfigurationJsonError("");
-
-    } 
+    }
     catch (error) {
       setConfigurationJsonError(error.message);
     }
@@ -208,18 +207,18 @@ export function Simulator() {
 
     const possibleMoves = [
       ...merges.map(
-        ([polymer1, polymer2]) => ({
+        (merge) => ({
           type: "merge",
-          polymer1,
-          polymer2,
+          polymer1: merge.polymers[0],
+          polymer2: merge.polymers[1],
         })
       ),
 
       ...splits.map(
-        ([polymer, splitMonomers]) => ({
+        (split) => ({
           type: "split",
-          polymer,
-          splitMonomers,
+          polymer: split.polymer,
+          splitMonomers: split.split_monomers,
         })
       ),
     ];
@@ -259,7 +258,10 @@ export function Simulator() {
    * ================================
    */
 
-  function executeMerge(polymer1, polymer2) {
+  function executeMerge(
+    polymer1,
+    polymer2
+  ) {
     if (!simulation) {
       return;
     }
@@ -303,6 +305,7 @@ export function Simulator() {
   function addPolymer() {
     setPolymersConfig((current) => [
       ...current,
+
       {
         name: `P${current.length + 1}`,
         monomers: [],
@@ -472,8 +475,8 @@ export function Simulator() {
               : polymer
         )
       );
-
-    } catch {
+    }
+    catch {
       // Invalid JSON while typing.
     }
   }
@@ -708,186 +711,172 @@ export function Simulator() {
 
             {initialConfigOpen && (
 
-              <>
+              <div className="polymer-editor">
 
-                {/* POLYMER CARDS */}
+                {polymersConfig.map(
+                  (
+                    polymer,
+                    polymerIndex
+                  ) => (
 
-                <div className="polymer-editor">
+                    <div
+                      className="polymer-card"
+                      key={polymerIndex}
+                    >
 
-                  {polymersConfig.map(
-                    (
-                      polymer,
-                      polymerIndex
-                    ) => (
+                      <div className="polymer-card-header">
 
-                      <div
-                        className="polymer-card"
-                        key={polymerIndex}
-                      >
+                        <div>
 
-                        {/* POLYMER HEADER */}
+                          <h3>
+                            {polymer.name}
+                          </h3>
 
-                        <div className="polymer-card-header">
-
-                          <div>
-
-                            <h3>
-                              {polymer.name}
-                            </h3>
-
-                            <span>
-                              {
-                                polymer.monomers.length
-                              }{" "}
-                              {
-                                polymer.monomers.length ===
-                                1
-                                  ? "monomer"
-                                  : "monomers"
-                              }
-                            </span>
-
-                          </div>
-
-                          <button
-                            className="delete-button"
-                            onClick={() =>
-                              removePolymer(
-                                polymerIndex
-                              )
+                          <span>
+                            {
+                              polymer.monomers.length
+                            }{" "}
+                            {
+                              polymer.monomers.length ===
+                              1
+                                ? "monomer"
+                                : "monomers"
                             }
-                          >
-                            ×
-                          </button>
+                          </span>
 
                         </div>
-
-                        {/* MONOMERS */}
-
-                        <div className="monomer-cards">
-
-                          {polymer.monomers.map(
-                            (
-                              monomer,
-                              monomerIndex
-                            ) => {
-
-                              const domainKey =
-                                `${polymerIndex}-${monomerIndex}`;
-
-                              return (
-
-                                <div
-                                  className="monomer-card"
-                                  key={
-                                    monomerIndex
-                                  }
-                                >
-
-                                  <input
-                                    className="name-input"
-                                    value={
-                                      monomer.name
-                                    }
-                                    onChange={(
-                                      event
-                                    ) =>
-                                      updateMonomerName(
-                                        polymerIndex,
-                                        monomerIndex,
-                                        event.target.value
-                                      )
-                                    }
-                                  />
-
-                                  <input
-                                    className="domains-input"
-                                    value={
-                                      domainInputs[
-                                        domainKey
-                                      ] ??
-                                      JSON.stringify(
-                                        monomer.domains
-                                      )
-                                    }
-                                    onChange={(
-                                      event
-                                    ) =>
-                                      updateMonomerDomains(
-                                        polymerIndex,
-                                        monomerIndex,
-                                        event.target.value
-                                      )
-                                    }
-                                  />
-
-                                  <button
-                                    className="delete-button"
-                                    onClick={() =>
-                                      removeMonomer(
-                                        polymerIndex,
-                                        monomerIndex
-                                      )
-                                    }
-                                  >
-                                    ×
-                                  </button>
-
-                                </div>
-
-                              );
-                            }
-                          )}
-
-                        </div>
-
-                        {/* ADD MONOMER */}
 
                         <button
-                          className="add-monomer"
+                          className="delete-button"
                           onClick={() =>
-                            addMonomer(
+                            removePolymer(
                               polymerIndex
                             )
                           }
                         >
-                          + Add Monomer
+                          ×
                         </button>
 
                       </div>
 
-                    )
-                  )}
+                      <div className="monomer-cards">
 
-                </div>
+                        {polymer.monomers.map(
+                          (
+                            monomer,
+                            monomerIndex
+                          ) => {
 
-                {/* CONFIGURATION ACTIONS */}
+                            const domainKey =
+                              `${polymerIndex}-${monomerIndex}`;
 
-                <div className="configuration-actions">
+                            return (
 
-                  <button
-                    className="primary-button"
-                    onClick={
-                      initializeSimulation
-                    }
-                  >
-                    Initialize Simulation
-                  </button>
+                              <div
+                                className="monomer-card"
+                                key={
+                                  monomerIndex
+                                }
+                              >
 
-                  <button
-                    className="secondary-button"
-                    onClick={
-                      resetSimulation
-                    }
-                  >
-                    Reset
-                  </button>
+                                <input
+                                  className="name-input"
+                                  value={
+                                    monomer.name
+                                  }
+                                  onChange={(
+                                    event
+                                  ) =>
+                                    updateMonomerName(
+                                      polymerIndex,
+                                      monomerIndex,
+                                      event.target.value
+                                    )
+                                  }
+                                />
 
-                </div>
+                                <input
+                                  className="domains-input"
+                                  value={
+                                    domainInputs[
+                                      domainKey
+                                    ] ??
+                                    JSON.stringify(
+                                      monomer.domains
+                                    )
+                                  }
+                                  onChange={(
+                                    event
+                                  ) =>
+                                    updateMonomerDomains(
+                                      polymerIndex,
+                                      monomerIndex,
+                                      event.target.value
+                                    )
+                                  }
+                                />
 
-              </>
+                                <button
+                                  className="delete-button"
+                                  onClick={() =>
+                                    removeMonomer(
+                                      polymerIndex,
+                                      monomerIndex
+                                    )
+                                  }
+                                >
+                                  ×
+                                </button>
+
+                              </div>
+
+                            );
+                          }
+                        )}
+
+                      </div>
+
+                      <button
+                        className="add-monomer"
+                        onClick={() =>
+                          addMonomer(
+                            polymerIndex
+                          )
+                        }
+                      >
+                        + Add Monomer
+                      </button>
+
+                    </div>
+
+                  )
+                )}
+
+              </div>
 
             )}
+
+            <div className="configuration-actions">
+
+              <button
+                className="primary-button"
+                onClick={
+                  initializeSimulation
+                }
+              >
+                Initialize Simulation
+              </button>
+
+              <button
+                className="secondary-button"
+                onClick={
+                  resetSimulation
+                }
+              >
+                Reset
+              </button>
+
+            </div>
 
           </section>
 
@@ -1074,8 +1063,6 @@ export function Simulator() {
 
           </div>
 
-          {/* SIMULATION BOARD */}
-
           {simulation && (
 
             <div className="board">
@@ -1117,74 +1104,91 @@ export function Simulator() {
 
             {merges.map(
               (
-                [polymer1, polymer2],
+                merge,
                 index
-              ) => (
+              ) => {
 
-                <button
-                  className="move-card"
-                  key={`merge-${index}`}
-                  onClick={() =>
-                    executeMerge(
-                      polymer1,
-                      polymer2
-                    )
-                  }
-                >
+                const [
+                  polymer1,
+                  polymer2
+                ] = merge.polymers;
 
-                  <span className="move-type">
-                    MERGE
-                  </span>
+                return (
 
-                  <span>
-                    {polymer1.name}
-                    {" + "}
-                    {polymer2.name}
-                  </span>
+                  <button
+                    className="move-card"
+                    key={`merge-${index}`}
+                    onClick={() =>
+                      executeMerge(
+                        polymer1,
+                        polymer2
+                      )
+                    }
+                  >
 
-                </button>
+                    <span className="move-type">
+                      MERGE
+                    </span>
 
-              )
+                    <span>
+                      {polymer1.name}
+                      {" + "}
+                      {polymer2.name}
+                    </span>
+
+                  </button>
+
+                );
+              }
             )}
 
             {/* SPLITS */}
 
             {splits.map(
               (
-                [polymer, splitMonomers],
+                split,
                 index
-              ) => (
+              ) => {
 
-                <button
-                  className="move-card"
-                  key={`split-${index}`}
-                  onClick={() =>
-                    executeSplit(
-                      polymer,
-                      splitMonomers
-                    )
-                  }
-                >
+                const polymer =
+                  split.polymer;
 
-                  <span className="move-type">
-                    SPLIT
-                  </span>
+                const splitMonomers =
+                  split.split_monomers;
 
-                  <span>
-                    {polymer.name}
-                    {" → "}
+                return (
 
-                    {splitMonomers
-                      .map(
-                        (monomer) =>
-                          monomer.name
+                  <button
+                    className="move-card"
+                    key={`split-${index}`}
+                    onClick={() =>
+                      executeSplit(
+                        polymer,
+                        splitMonomers
                       )
-                      .join(", ")}
-                  </span>
+                    }
+                  >
 
-                </button>
+                    <span className="move-type">
+                      SPLIT
+                    </span>
 
-              )
+                    <span>
+                      {polymer.name}
+                      {" → "}
+
+                      {splitMonomers
+                        .map(
+                          (monomer) =>
+                            monomer.name
+                        )
+                        .join(", ")}
+                    </span>
+
+                  </button>
+
+                );
+              }
             )}
 
             {/* NO MOVES */}
@@ -1217,8 +1221,6 @@ function PolymerView({ polymer }) {
   return (
     <div className="card polymer-card">
 
-      {/* POLYMER HEADER */}
-
       <div className="card-header polymer-card-header">
 
         <div>
@@ -1237,8 +1239,6 @@ function PolymerView({ polymer }) {
         </div>
 
       </div>
-
-      {/* MONOMERS */}
 
       <div className="card-body">
 
@@ -1268,8 +1268,6 @@ function MonomerView({ monomer }) {
   return (
     <div className="card monomer-card">
 
-      {/* DOMAINS */}
-
       <div className="card-body">
 
         <div className="domains">
@@ -1290,7 +1288,7 @@ function MonomerView({ monomer }) {
                 >
 
                   <span>
-                    {domain + " "}: 
+                    {domain + " "}:{" "}
                   </span>
 
                   <strong>
