@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { TBN_Simulation } from "./TBN_Simulation.js";
 
@@ -44,7 +43,6 @@ const DEFAULT_POLYMERS = [
 export function Simulator() {
   const [model, setModel] = useState("barrier");
 
-  // Keep these as strings so values such as "1/3" are allowed.
   const [w, setW] = useState("1");
   const [threshold, setThreshold] = useState("0");
   const [barrier, setBarrier] = useState("0");
@@ -52,12 +50,12 @@ export function Simulator() {
   const [polymersConfig, setPolymersConfig] =
     useState(DEFAULT_POLYMERS);
 
-  // Controls whether Initial Configuration is expanded.
   const [initialConfigOpen, setInitialConfigOpen] =
     useState(true);
 
-  // Stores the raw text currently being typed into
-  // each domain input.
+  const [jsonConfigOpen, setJsonConfigOpen] =
+    useState(false);
+
   const [domainInputs, setDomainInputs] =
     useState({});
 
@@ -66,8 +64,79 @@ export function Simulator() {
 
   const [, setMoveVersion] = useState(0);
 
+  const [configurationJson, setConfigurationJson] =
+    useState(JSON.stringify(DEFAULT_POLYMERS, null, 2));
 
-  /* 
+  const [configurationJsonError, setConfigurationJsonError] =
+    useState("");
+
+  /*
+   * ================================
+   * JSON CONFIG LOADER
+   * ================================
+   */
+
+  function loadConfigurationJson() {
+    try {
+      const configuration = JSON.parse(configurationJson);
+
+      if (!Array.isArray(configuration)) {
+        throw new Error(
+          "Configuration must be an array of polymers."
+        );
+      }
+
+      for (const polymer of configuration) {
+        if (
+          typeof polymer !== "object" ||
+          polymer === null ||
+          typeof polymer.name !== "string" ||
+          !Array.isArray(polymer.monomers)
+        ) {
+          throw new Error(
+            "Each polymer must have a name and monomers array."
+          );
+        }
+
+        for (const monomer of polymer.monomers) {
+          if (
+            typeof monomer !== "object" ||
+            monomer === null ||
+            typeof monomer.name !== "string" ||
+            typeof monomer.domains !== "object" ||
+            monomer.domains === null ||
+            Array.isArray(monomer.domains)
+          ) {
+            throw new Error(
+              "Each monomer must have a name and domains object."
+            );
+          }
+
+          for (const quantity of Object.values(monomer.domains)) {
+            if (
+              typeof quantity !== "number" ||
+              !Number.isFinite(quantity)
+            ) {
+              throw new Error(
+                "Domain quantities must be numbers."
+              );
+            }
+          }
+        }
+      }
+
+      setPolymersConfig(configuration);
+      setInitialConfigOpen(true);
+      setDomainInputs({});
+      setConfigurationJsonError("");
+
+    } 
+    catch (error) {
+      setConfigurationJsonError(error.message);
+    }
+  }
+
+  /*
    * ================================
    * INITIALIZE SIMULATION
    * ================================
@@ -83,14 +152,10 @@ export function Simulator() {
       }
     );
 
-    // Create each polymer from the starting configuration.
     for (const polymerData of polymersConfig) {
-
       const polymer = sim.createPolymer();
 
-      // Add each monomer to this polymer.
       for (const monomerData of polymerData.monomers) {
-
         const domains = new Map(
           Object.entries(monomerData.domains)
         );
@@ -104,15 +169,19 @@ export function Simulator() {
 
     sim.energy = sim.calculate_energy();
 
+    setConfigurationJson(
+      JSON.stringify(
+        polymersConfig,
+        null,
+        2
+      )
+    );
+
     setSimulation(sim);
     setMoveVersion((v) => v + 1);
-
-    // Collapse the configuration after initialization.
-    setInitialConfigOpen(false);
   }
 
-
-  /* 
+  /*
    * ================================
    * RESET
    * ================================
@@ -123,8 +192,7 @@ export function Simulator() {
     setMoveVersion((v) => v + 1);
   }
 
-
-  /* 
+  /*
    * ================================
    * RANDOM STEP
    * ================================
@@ -185,8 +253,7 @@ export function Simulator() {
     setMoveVersion((v) => v + 1);
   }
 
-
-  /* 
+  /*
    * ================================
    * EXECUTE MERGE
    * ================================
@@ -205,8 +272,7 @@ export function Simulator() {
     setMoveVersion((v) => v + 1);
   }
 
-
-  /* 
+  /*
    * ================================
    * EXECUTE SPLIT
    * ================================
@@ -228,8 +294,7 @@ export function Simulator() {
     setMoveVersion((v) => v + 1);
   }
 
-
-  /* 
+  /*
    * ================================
    * POLYMER CONFIGURATION
    * ================================
@@ -253,8 +318,7 @@ export function Simulator() {
     );
   }
 
-
-  /* 
+  /*
    * ================================
    * MONOMER CONFIGURATION
    * ================================
@@ -286,12 +350,10 @@ export function Simulator() {
     );
   }
 
-
   function removeMonomer(
     polymerIndex,
     monomerIndex
   ) {
-    // Remove the temporary domain input value.
     const key =
       `${polymerIndex}-${monomerIndex}`;
 
@@ -321,8 +383,7 @@ export function Simulator() {
     );
   }
 
-
-  /* 
+  /*
    * ================================
    * MONOMER NAME
    * ================================
@@ -358,8 +419,7 @@ export function Simulator() {
     );
   }
 
-
-  /* 
+  /*
    * ================================
    * MONOMER DOMAINS
    * ================================
@@ -373,9 +433,6 @@ export function Simulator() {
     const key =
       `${polymerIndex}-${monomerIndex}`;
 
-    // Always store the text being typed.
-    // This allows the user to temporarily
-    // have invalid JSON while editing.
     setDomainInputs((current) => ({
       ...current,
       [key]: value,
@@ -384,7 +441,6 @@ export function Simulator() {
     try {
       const domains = JSON.parse(value);
 
-      // Make sure the parsed value is an object.
       if (
         domains === null ||
         typeof domains !== "object" ||
@@ -393,8 +449,6 @@ export function Simulator() {
         return;
       }
 
-      // Update the actual configuration only
-      // when the JSON is valid.
       setPolymersConfig((current) =>
         current.map(
           (polymer, pIndex) =>
@@ -421,13 +475,10 @@ export function Simulator() {
 
     } catch {
       // Invalid JSON while typing.
-      // This is okay because the raw text
-      // is stored in domainInputs.
     }
   }
 
-
-  /* 
+  /*
    * ================================
    * CURRENT MOVES
    * ================================
@@ -443,8 +494,7 @@ export function Simulator() {
       ? simulation.validSplits()
       : [];
 
-
-  /* 
+  /*
    * ================================
    * CURRENT POLYMERS
    * ================================
@@ -454,7 +504,6 @@ export function Simulator() {
     simulation
       ? [...simulation.polymers.values()]
       : [];
-
 
   return (
     <div className="app">
@@ -478,7 +527,6 @@ export function Simulator() {
 
         </div>
 
-
         {simulation && (
 
           <div className="energy-display">
@@ -499,7 +547,6 @@ export function Simulator() {
 
       </header>
 
-
       {/* =========================
           MAIN
       ========================== */}
@@ -519,7 +566,6 @@ export function Simulator() {
             <h2>
               Simulation Model
             </h2>
-
 
             <label>
 
@@ -550,7 +596,6 @@ export function Simulator() {
 
             </label>
 
-
             <label>
 
               w
@@ -567,7 +612,6 @@ export function Simulator() {
               />
 
             </label>
-
 
             {model === "threshold" && (
 
@@ -589,7 +633,6 @@ export function Simulator() {
               </label>
 
             )}
-
 
             {model === "barrier" && (
 
@@ -613,7 +656,6 @@ export function Simulator() {
             )}
 
           </section>
-
 
           {/* =======================
               INITIAL CONFIGURATION
@@ -651,7 +693,6 @@ export function Simulator() {
 
               </button>
 
-
               {initialConfigOpen && (
 
                 <button
@@ -664,7 +705,6 @@ export function Simulator() {
               )}
 
             </div>
-
 
             {initialConfigOpen && (
 
@@ -698,8 +738,7 @@ export function Simulator() {
                             <span>
                               {
                                 polymer.monomers.length
-                              }
-                              {" "}
+                              }{" "}
                               {
                                 polymer.monomers.length ===
                                 1
@@ -709,7 +748,6 @@ export function Simulator() {
                             </span>
 
                           </div>
-
 
                           <button
                             className="delete-button"
@@ -723,7 +761,6 @@ export function Simulator() {
                           </button>
 
                         </div>
-
 
                         {/* MONOMERS */}
 
@@ -739,6 +776,7 @@ export function Simulator() {
                                 `${polymerIndex}-${monomerIndex}`;
 
                               return (
+
                                 <div
                                   className="monomer-card"
                                   key={
@@ -757,13 +795,10 @@ export function Simulator() {
                                       updateMonomerName(
                                         polymerIndex,
                                         monomerIndex,
-                                        event
-                                          .target
-                                          .value
+                                        event.target.value
                                       )
                                     }
                                   />
-
 
                                   <input
                                     className="domains-input"
@@ -781,13 +816,10 @@ export function Simulator() {
                                       updateMonomerDomains(
                                         polymerIndex,
                                         monomerIndex,
-                                        event
-                                          .target
-                                          .value
+                                        event.target.value
                                       )
                                     }
                                   />
-
 
                                   <button
                                     className="delete-button"
@@ -802,12 +834,12 @@ export function Simulator() {
                                   </button>
 
                                 </div>
+
                               );
                             }
                           )}
 
                         </div>
-
 
                         {/* ADD MONOMER */}
 
@@ -829,7 +861,6 @@ export function Simulator() {
 
                 </div>
 
-
                 {/* CONFIGURATION ACTIONS */}
 
                 <div className="configuration-actions">
@@ -842,7 +873,6 @@ export function Simulator() {
                   >
                     Initialize Simulation
                   </button>
-
 
                   <button
                     className="secondary-button"
@@ -861,6 +891,87 @@ export function Simulator() {
 
           </section>
 
+          {/* =======================
+              JSON CONFIGURATION
+          ======================== */}
+
+          <section className="panel">
+
+            <div className="panel-heading">
+
+              <button
+                className="collapse-button"
+                onClick={() =>
+                  setJsonConfigOpen(
+                    (open) => !open
+                  )
+                }
+                aria-expanded={
+                  jsonConfigOpen
+                }
+              >
+
+                <span
+                  className={`collapse-icon ${
+                    jsonConfigOpen
+                      ? "open"
+                      : ""
+                  }`}
+                >
+                  ›
+                </span>
+
+                <h2>
+                  JSON Configuration
+                </h2>
+
+              </button>
+
+            </div>
+
+            {jsonConfigOpen && (
+
+              <div className="json-configuration">
+
+                <label>
+                  Initial Configuration JSON
+                </label>
+
+                <textarea
+                  value={configurationJson}
+                  onChange={(event) => {
+                    setConfigurationJson(
+                      event.target.value
+                    );
+
+                    setConfigurationJsonError("");
+                  }}
+                  rows={12}
+                  spellCheck={false}
+                />
+
+                {configurationJsonError && (
+
+                  <div className="json-error">
+                    {configurationJsonError}
+                  </div>
+
+                )}
+
+                <button
+                  className="secondary-button"
+                  onClick={
+                    loadConfigurationJson
+                  }
+                >
+                  Load JSON Configuration
+                </button>
+
+              </div>
+
+            )}
+
+          </section>
 
           {/* =======================
               SIMULATION CONTROLS
@@ -874,7 +985,6 @@ export function Simulator() {
                 Simulation
               </h2>
 
-
               <div className="move-count">
 
                 <span>
@@ -886,7 +996,6 @@ export function Simulator() {
                 </strong>
 
               </div>
-
 
               <div className="move-count">
 
@@ -900,7 +1009,6 @@ export function Simulator() {
 
               </div>
 
-
               <div className="move-count">
 
                 <span>
@@ -912,7 +1020,6 @@ export function Simulator() {
                 </strong>
 
               </div>
-
 
               <button
                 className="primary-button"
@@ -926,7 +1033,6 @@ export function Simulator() {
           )}
 
         </aside>
-
 
         {/* =======================
             BOARD
@@ -952,7 +1058,6 @@ export function Simulator() {
 
             </div>
 
-
             {simulation && (
 
               <div className="toolbar-buttons">
@@ -968,7 +1073,6 @@ export function Simulator() {
             )}
 
           </div>
-
 
           {/* SIMULATION BOARD */}
 
@@ -995,7 +1099,6 @@ export function Simulator() {
 
       </main>
 
-
       {/* =========================
           VALID MOVES
       ========================== */}
@@ -1007,7 +1110,6 @@ export function Simulator() {
           <h2>
             Valid Transitions
           </h2>
-
 
           <div className="move-list">
 
@@ -1044,7 +1146,6 @@ export function Simulator() {
 
               )
             )}
-
 
             {/* SPLITS */}
 
@@ -1086,7 +1187,6 @@ export function Simulator() {
               )
             )}
 
-
             {/* NO MOVES */}
 
             {merges.length === 0 &&
@@ -1107,7 +1207,6 @@ export function Simulator() {
     </div>
   );
 }
-
 
 /* =================================
    POLYMER VIEW
@@ -1139,7 +1238,6 @@ function PolymerView({ polymer }) {
 
       </div>
 
-
       {/* MONOMERS */}
 
       <div className="card-body">
@@ -1160,7 +1258,6 @@ function PolymerView({ polymer }) {
     </div>
   );
 }
-
 
 /* =================================
    MONOMER VIEW
@@ -1193,7 +1290,7 @@ function MonomerView({ monomer }) {
                 >
 
                   <span>
-                    {domain + " "}:
+                    {domain + " "}: 
                   </span>
 
                   <strong>
@@ -1209,7 +1306,6 @@ function MonomerView({ monomer }) {
 
         </div>
 
-
         <div className="monomer-name">
           {monomer.name}
         </div>
@@ -1219,4 +1315,3 @@ function MonomerView({ monomer }) {
     </div>
   );
 }
-
