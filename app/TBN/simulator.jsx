@@ -1,44 +1,57 @@
 import { useState } from "react";
 import { TBN_Simulation } from "./TBN_Simulation.js";
 
-const DEFAULT_POLYMERS = [
-  {
-    name: "P1",
-    monomers: [
-      {
-        name: "A",
-        domains: {
-          x: 1,
-          y: -1,
-        },
-      },
-    ],
-  },
-  {
-    name: "P2",
-    monomers: [
-      {
-        name: "B",
-        domains: {
-          x: -1,
-          z: 1,
-        },
-      },
-    ],
-  },
-  {
-    name: "P3",
-    monomers: [
-      {
-        name: "C",
-        domains: {
-          y: 1,
-          z: -1,
-        },
-      },
-    ],
-  },
-];
+const DEFAULT_CONFIG = {
+  model: "threshold",
+  w: "1/3",
+  threshold: "0",
+  "initial config": [
+    {
+      name: "P1",
+      monomers: [
+        {
+          name: "A1",
+          domains: {
+            "Γ": 2,
+            "σ": 1,
+            "Λ_1": -1,
+            "Λ_3": -1
+          }
+        }
+      ]
+    },
+    {
+      name: "P2",
+      monomers: [
+        {
+          name: "A2",
+          domains: {
+            "Γ": -1,
+            "σ": 1,
+            "Λ_1": 2,
+            "Λ_2": -1,
+            "B_2": -1
+          }
+        }
+      ]
+    },
+    {
+      name: "P3",
+      monomers: [
+        {
+          name: "A3",
+          domains: {
+            "Γ": -1,
+            "σ": 2,
+            "Λ_2": 1,
+            "Λ_3": -2,
+            "B_1": -1
+          }
+        }
+      ]
+    }
+  ]
+};
 
 export function Simulator() {
   const [model, setModel] = useState("barrier");
@@ -47,28 +60,21 @@ export function Simulator() {
   const [threshold, setThreshold] = useState("0");
   const [barrier, setBarrier] = useState("0");
 
-  const [polymersConfig, setPolymersConfig] =
-    useState(DEFAULT_POLYMERS);
+  const [polymersConfig, setPolymersConfig] = useState(DEFAULT_CONFIG["initial config"]);
+  
+  const [initialConfigOpen, setInitialConfigOpen] = useState(true);
 
-  const [initialConfigOpen, setInitialConfigOpen] =
-    useState(true);
+  const [jsonConfigOpen, setJsonConfigOpen] = useState(false);
 
-  const [jsonConfigOpen, setJsonConfigOpen] =
-    useState(false);
+  const [domainInputs, setDomainInputs] = useState({});
 
-  const [domainInputs, setDomainInputs] =
-    useState({});
-
-  const [simulation, setSimulation] =
-    useState(null);
+  const [simulation, setSimulation] = useState(null);
 
   const [, setMoveVersion] = useState(0);
 
-  const [configurationJson, setConfigurationJson] =
-    useState(JSON.stringify(DEFAULT_POLYMERS, null, 2));
-
-  const [configurationJsonError, setConfigurationJsonError] =
-    useState("");
+  const [configurationJson, setConfigurationJson] = useState(JSON.stringify(DEFAULT_CONFIG, null, 2));
+  
+  const [configurationJsonError, setConfigurationJsonError] = useState("");
 
   /*
    * ================================
@@ -80,13 +86,54 @@ export function Simulator() {
     try {
       const configuration = JSON.parse(configurationJson);
 
-      if (!Array.isArray(configuration)) {
+      if (typeof configuration !== "object" || configuration === null || Array.isArray(configuration) ) {
         throw new Error(
-          "Configuration must be an array of polymers."
+          "Configuration must be an object containing model settings and an initial config."
         );
       }
 
-      for (const polymer of configuration) {
+      if (typeof configuration.model !== "string") {
+        throw new Error("Model must be a string.");
+      }
+
+      const validModels = ["greedy", "threshold", "barrier"];
+
+      if (!validModels.includes(configuration.model)) {
+        throw new Error(
+          `Model must be one of: ${validModels.join(", ")}.`
+        );
+      }
+
+      if (typeof configuration.w !== "string" && typeof configuration.w !== "number" ) {
+        throw new Error("w must be a number or fraction string.");
+      }
+
+      if (configuration.model === "threshold") {
+        if (typeof configuration.threshold !== "string") {
+          throw new Error(
+            "Threshold must be a string when using the threshold model."
+          );
+        }
+      }
+
+      if (configuration.model === "barrier") {
+        if (typeof configuration.barrier !== "string") {
+          throw new Error(
+            "Barrier must be a string when using the barrier model."
+          );
+        }
+      }
+
+      const initialConfig = configuration["initial config"];
+
+      if (!Array.isArray(initialConfig)) {
+        throw new Error(
+          '"initial config" must be an array of polymers.'
+        );
+      }
+
+      // Validate polymers
+      for (const polymer of initialConfig) {
         if (
           typeof polymer !== "object" ||
           polymer === null ||
@@ -98,6 +145,7 @@ export function Simulator() {
           );
         }
 
+        // Validate monomers
         for (const monomer of polymer.monomers) {
           if (
             typeof monomer !== "object" ||
@@ -112,6 +160,7 @@ export function Simulator() {
             );
           }
 
+          // Validate domain quantities
           for (const quantity of Object.values(monomer.domains)) {
             if (
               typeof quantity !== "number" ||
@@ -125,7 +174,19 @@ export function Simulator() {
         }
       }
 
-      setPolymersConfig(configuration);
+      // Apply the configuration
+      setModel(configuration.model);
+      setW(String(configuration.w));
+
+      if (configuration.model === "threshold") {
+        setThreshold(String(configuration.threshold));
+      }
+
+      if (configuration.model === "barrier") {
+        setBarrier(String(configuration.barrier));
+      }
+
+      setPolymersConfig(initialConfig);
       setInitialConfigOpen(false);
       setDomainInputs({});
       setConfigurationJsonError("");
@@ -134,6 +195,7 @@ export function Simulator() {
       setConfigurationJsonError(error.message);
     }
   }
+
 
   /*
    * ================================
