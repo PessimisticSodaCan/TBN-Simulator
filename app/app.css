@@ -704,8 +704,6 @@ button {
 
 .board .polymer-card {
     width: fit-content;
-    max-width: 510px;
-
     height: fit-content;
 
     border: 2px dotted #4d4a4a;
@@ -746,7 +744,7 @@ button {
     gap: 10px;
 
     width: fit-content;
-    max-width: 510px;
+    max-width: 900px;
 }
 
 

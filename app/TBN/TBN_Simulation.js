@@ -212,7 +212,50 @@ export class TBN_Simulation {
         }
     }
 
+    comparePolymers(polymer1, polymer2) {
 
+        const shared_bonds = new Map();
+
+        let total_bonds = 0;
+
+        for (const [domain, polymer1_data] of polymer1.domain_table) {
+
+            const polymer2_data = polymer2.domain_table.get(domain);
+
+            if (polymer2_data === undefined) {
+                continue;
+            }
+
+            const bonds_1 = polymer1_data.aggregate;
+
+            const bonds_2 = polymer2_data.aggregate;
+
+            if (bonds_1 * bonds_2 < 0) {
+
+                const bonds =
+                    Math.min(
+                        Math.abs(bonds_1),
+                        Math.abs(bonds_2)
+                    );
+
+                if (bonds > 0) {
+
+                    shared_bonds.set(
+                        domain,
+                        bonds
+                    );
+
+                    total_bonds += bonds;
+                }
+            }
+        }
+
+        return {
+            polymers: [polymer1, polymer2],
+            shared_bonds,
+            total_bonds
+        };
+    }
     merge(polymer1, polymer2) {
 
         const receipt = this.energy_change("merge", [polymer1, polymer2]);

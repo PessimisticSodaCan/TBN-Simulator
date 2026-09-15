@@ -54,27 +54,58 @@ const DEFAULT_CONFIG = {
 };
 
 export function Simulator() {
+
   const [model, setModel] = useState("barrier");
 
   const [w, setW] = useState("1");
   const [threshold, setThreshold] = useState("0");
   const [barrier, setBarrier] = useState("0");
 
-  const [polymersConfig, setPolymersConfig] = useState(DEFAULT_CONFIG["initial config"]);
-  
-  const [initialConfigOpen, setInitialConfigOpen] = useState(true);
+  const [polymersConfig, setPolymersConfig] =
+    useState(DEFAULT_CONFIG["initial config"]);
 
-  const [jsonConfigOpen, setJsonConfigOpen] = useState(false);
+  const [initialConfigOpen, setInitialConfigOpen] =
+    useState(true);
 
-  const [domainInputs, setDomainInputs] = useState({});
+  const [jsonConfigOpen, setJsonConfigOpen] =
+    useState(false);
 
-  const [simulation, setSimulation] = useState(null);
+  const [domainInputs, setDomainInputs] =
+    useState({});
 
-  const [, setMoveVersion] = useState(0);
+  const [simulation, setSimulation] =
+    useState(null);
 
-  const [configurationJson, setConfigurationJson] = useState(JSON.stringify(DEFAULT_CONFIG, null, 2));
-  
-  const [configurationJsonError, setConfigurationJsonError] = useState("");
+  const [, setMoveVersion] =
+    useState(0);
+
+  const [configurationJson, setConfigurationJson] =
+    useState(
+      JSON.stringify(
+        DEFAULT_CONFIG,
+        null,
+        2
+      )
+    );
+
+  const [configurationJsonError, setConfigurationJsonError] =
+    useState("");
+
+  /*
+   * ================================
+   * POLYMER COMPARISON
+   * ================================
+   */
+
+  const [comparePolymer1, setComparePolymer1] =
+    useState("");
+
+  const [comparePolymer2, setComparePolymer2] =
+    useState("");
+
+  const [comparison, setComparison] =
+    useState(null);
+
 
   /*
    * ================================
@@ -83,57 +114,98 @@ export function Simulator() {
    */
 
   function loadConfigurationJson() {
-    try {
-      const configuration = JSON.parse(configurationJson);
 
-      if (typeof configuration !== "object" || configuration === null || Array.isArray(configuration) ) {
+    try {
+
+      const configuration =
+        JSON.parse(configurationJson);
+
+      if (
+        typeof configuration !== "object" ||
+        configuration === null ||
+        Array.isArray(configuration)
+      ) {
         throw new Error(
           "Configuration must be an object containing model settings and an initial config."
         );
       }
 
-      if (typeof configuration.model !== "string") {
-        throw new Error("Model must be a string.");
+      if (
+        typeof configuration.model !== "string"
+      ) {
+        throw new Error(
+          "Model must be a string."
+        );
       }
 
-      const validModels = ["greedy", "threshold", "barrier"];
+      const validModels = [
+        "greedy",
+        "threshold",
+        "barrier"
+      ];
 
-      if (!validModels.includes(configuration.model)) {
+      if (
+        !validModels.includes(
+          configuration.model
+        )
+      ) {
         throw new Error(
           `Model must be one of: ${validModels.join(", ")}.`
         );
       }
 
-      if (typeof configuration.w !== "string" && typeof configuration.w !== "number" ) {
-        throw new Error("w must be a number or fraction string.");
+      if (
+        typeof configuration.w !== "string" &&
+        typeof configuration.w !== "number"
+      ) {
+        throw new Error(
+          "w must be a number or fraction string."
+        );
       }
 
-      if (configuration.model === "threshold") {
-        if (typeof configuration.threshold !== "string") {
+      if (
+        configuration.model === "threshold"
+      ) {
+
+        if (
+          typeof configuration.threshold !==
+          "string"
+        ) {
           throw new Error(
             "Threshold must be a string when using the threshold model."
           );
         }
       }
 
-      if (configuration.model === "barrier") {
-        if (typeof configuration.barrier !== "string") {
+      if (
+        configuration.model === "barrier"
+      ) {
+
+        if (
+          typeof configuration.barrier !==
+          "string"
+        ) {
           throw new Error(
             "Barrier must be a string when using the barrier model."
           );
         }
       }
 
-      const initialConfig = configuration["initial config"];
+      const initialConfig =
+        configuration["initial config"];
 
-      if (!Array.isArray(initialConfig)) {
+      if (
+        !Array.isArray(initialConfig)
+      ) {
         throw new Error(
           '"initial config" must be an array of polymers.'
         );
       }
 
-      // Validate polymers
-      for (const polymer of initialConfig) {
+      for (
+        const polymer of initialConfig
+      ) {
+
         if (
           typeof polymer !== "object" ||
           polymer === null ||
@@ -145,8 +217,10 @@ export function Simulator() {
           );
         }
 
-        // Validate monomers
-        for (const monomer of polymer.monomers) {
+        for (
+          const monomer of polymer.monomers
+        ) {
+
           if (
             typeof monomer !== "object" ||
             monomer === null ||
@@ -160,8 +234,12 @@ export function Simulator() {
             );
           }
 
-          // Validate domain quantities
-          for (const quantity of Object.values(monomer.domains)) {
+          for (
+            const quantity of Object.values(
+              monomer.domains
+            )
+          ) {
+
             if (
               typeof quantity !== "number" ||
               !Number.isFinite(quantity)
@@ -174,25 +252,47 @@ export function Simulator() {
         }
       }
 
-      // Apply the configuration
-      setModel(configuration.model);
-      setW(String(configuration.w));
+      setModel(
+        configuration.model
+      );
 
-      if (configuration.model === "threshold") {
-        setThreshold(String(configuration.threshold));
+      setW(
+        String(configuration.w)
+      );
+
+      if (
+        configuration.model === "threshold"
+      ) {
+        setThreshold(
+          String(configuration.threshold)
+        );
       }
 
-      if (configuration.model === "barrier") {
-        setBarrier(String(configuration.barrier));
+      if (
+        configuration.model === "barrier"
+      ) {
+        setBarrier(
+          String(configuration.barrier)
+        );
       }
 
-      setPolymersConfig(initialConfig);
+      setPolymersConfig(
+        initialConfig
+      );
+
       setInitialConfigOpen(false);
+
       setDomainInputs({});
+
       setConfigurationJsonError("");
+
     }
     catch (error) {
-      setConfigurationJsonError(error.message);
+
+      setConfigurationJsonError(
+        error.message
+      );
+
     }
   }
 
@@ -204,22 +304,34 @@ export function Simulator() {
    */
 
   function initializeSimulation() {
-    const sim = new TBN_Simulation(
-      w,
-      {
-        model,
-        threshold,
-        barrier,
-      }
-    );
 
-    for (const polymerData of polymersConfig) {
-      const polymer = sim.createPolymer();
+    const sim =
+      new TBN_Simulation(
+        w,
+        {
+          model,
+          threshold,
+          barrier,
+        }
+      );
 
-      for (const monomerData of polymerData.monomers) {
-        const domains = new Map(
-          Object.entries(monomerData.domains)
-        );
+    for (
+      const polymerData of polymersConfig
+    ) {
+
+      const polymer =
+        sim.createPolymer();
+
+      for (
+        const monomerData of polymerData.monomers
+      ) {
+
+        const domains =
+          new Map(
+            Object.entries(
+              monomerData.domains
+            )
+          );
 
         polymer.createMonomer(
           monomerData.name,
@@ -228,7 +340,8 @@ export function Simulator() {
       }
     }
 
-    sim.energy = sim.calculate_energy();
+    sim.energy =
+      sim.calculate_energy();
 
     setConfigurationJson(
       JSON.stringify(
@@ -239,8 +352,16 @@ export function Simulator() {
     );
 
     setSimulation(sim);
-    setMoveVersion((v) => v + 1);
+
+    setComparePolymer1("");
+    setComparePolymer2("");
+    setComparison(null);
+
+    setMoveVersion(
+      (v) => v + 1
+    );
   }
+
 
   /*
    * ================================
@@ -249,9 +370,18 @@ export function Simulator() {
    */
 
   function resetSimulation() {
+
     setSimulation(null);
-    setMoveVersion((v) => v + 1);
+
+    setComparePolymer1("");
+    setComparePolymer2("");
+    setComparison(null);
+
+    setMoveVersion(
+      (v) => v + 1
+    );
   }
+
 
   /*
    * ================================
@@ -260,32 +390,44 @@ export function Simulator() {
    */
 
   function randomStep() {
+
     if (!simulation) {
       return;
     }
 
-    const merges = simulation.validMerges();
-    const splits = simulation.validSplits();
+    const merges =
+      simulation.validMerges();
+
+    const splits =
+      simulation.validSplits();
 
     const possibleMoves = [
+
       ...merges.map(
         (merge) => ({
           type: "merge",
-          polymer1: merge.polymers[0],
-          polymer2: merge.polymers[1],
+          polymer1:
+            merge.polymers[0],
+          polymer2:
+            merge.polymers[1],
         })
       ),
 
       ...splits.map(
         (split) => ({
           type: "split",
-          polymer: split.polymer,
-          splitMonomers: split.split_monomers,
+          polymer:
+            split.polymer,
+          splitMonomers:
+            split.split_monomers,
         })
       ),
+
     ];
 
-    if (possibleMoves.length === 0) {
+    if (
+      possibleMoves.length === 0
+    ) {
       return;
     }
 
@@ -297,22 +439,33 @@ export function Simulator() {
         )
       ];
 
-    if (move.type === "merge") {
+    if (
+      move.type === "merge"
+    ) {
+
       simulation.merge(
         move.polymer1,
         move.polymer2
       );
     }
 
-    if (move.type === "split") {
+    if (
+      move.type === "split"
+    ) {
+
       simulation.split(
         move.polymer,
         move.splitMonomers
       );
     }
 
-    setMoveVersion((v) => v + 1);
+    setComparison(null);
+
+    setMoveVersion(
+      (v) => v + 1
+    );
   }
+
 
   /*
    * ================================
@@ -324,6 +477,7 @@ export function Simulator() {
     polymer1,
     polymer2
   ) {
+
     if (!simulation) {
       return;
     }
@@ -333,8 +487,13 @@ export function Simulator() {
       polymer2
     );
 
-    setMoveVersion((v) => v + 1);
+    setComparison(null);
+
+    setMoveVersion(
+      (v) => v + 1
+    );
   }
+
 
   /*
    * ================================
@@ -346,6 +505,7 @@ export function Simulator() {
     polymer,
     splitMonomers
   ) {
+
     if (!simulation) {
       return;
     }
@@ -355,8 +515,64 @@ export function Simulator() {
       splitMonomers
     );
 
-    setMoveVersion((v) => v + 1);
+    setComparison(null);
+
+    setMoveVersion(
+      (v) => v + 1
+    );
   }
+
+
+  /*
+   * ================================
+   * COMPARE POLYMERS
+   * ================================
+   */
+
+  function compareSelectedPolymers() {
+
+    if (!simulation) {
+      return;
+    }
+
+    const polymer1 =
+      simulation.polymers.get(
+        comparePolymer1
+      );
+
+    const polymer2 =
+      simulation.polymers.get(
+        comparePolymer2
+      );
+
+    if (
+      !polymer1 ||
+      !polymer2
+    ) {
+
+      setComparison(null);
+
+      return;
+    }
+
+    if (
+      polymer1 === polymer2
+    ) {
+
+      setComparison(null);
+
+      return;
+    }
+
+    const result =
+      simulation.comparePolymers(
+        polymer1,
+        polymer2
+      );
+
+    setComparison(result);
+  }
+
 
   /*
    * ================================
@@ -365,23 +581,37 @@ export function Simulator() {
    */
 
   function addPolymer() {
-    setPolymersConfig((current) => [
-      ...current,
 
-      {
-        name: `P${current.length + 1}`,
-        monomers: [],
-      },
-    ]);
-  }
+    setPolymersConfig(
+      (current) => [
 
-  function removePolymer(index) {
-    setPolymersConfig((current) =>
-      current.filter(
-        (_, i) => i !== index
-      )
+        ...current,
+
+        {
+          name:
+            `P${current.length + 1}`,
+
+          monomers: [],
+        },
+
+      ]
     );
   }
+
+
+  function removePolymer(
+    index
+  ) {
+
+    setPolymersConfig(
+      (current) =>
+        current.filter(
+          (_, i) =>
+            i !== index
+        )
+    );
+  }
+
 
   /*
    * ================================
@@ -389,64 +619,90 @@ export function Simulator() {
    * ================================
    */
 
-  function addMonomer(polymerIndex) {
-    setPolymersConfig((current) =>
-      current.map((polymer, index) =>
-        index === polymerIndex
-          ? {
-              ...polymer,
+  function addMonomer(
+    polymerIndex
+  ) {
 
-              monomers: [
-                ...polymer.monomers,
+    setPolymersConfig(
+      (current) =>
 
-                {
-                  name:
-                    `M${polymer.monomers.length + 1}`,
+        current.map(
+          (polymer, index) =>
 
-                  domains: {
-                    a: 1,
-                  },
-                },
-              ],
-            }
+            index === polymerIndex
+              ? {
 
-          : polymer
-      )
+                  ...polymer,
+
+                  monomers: [
+
+                    ...polymer.monomers,
+
+                    {
+
+                      name:
+                        `M${polymer.monomers.length + 1}`,
+
+                      domains: {
+                        a: 1,
+                      },
+
+                    },
+
+                  ],
+
+                }
+
+              : polymer
+        )
     );
   }
+
 
   function removeMonomer(
     polymerIndex,
     monomerIndex
   ) {
+
     const key =
       `${polymerIndex}-${monomerIndex}`;
 
-    setDomainInputs((current) => {
-      const updated = { ...current };
+    setDomainInputs(
+      (current) => {
 
-      delete updated[key];
+        const updated =
+          { ...current };
 
-      return updated;
-    });
+        delete updated[key];
 
-    setPolymersConfig((current) =>
-      current.map((polymer, index) =>
-        index === polymerIndex
-          ? {
-              ...polymer,
+        return updated;
+      }
+    );
 
-              monomers:
-                polymer.monomers.filter(
-                  (_, i) =>
-                    i !== monomerIndex
-                ),
-            }
+    setPolymersConfig(
+      (current) =>
 
-          : polymer
-      )
+        current.map(
+          (polymer, index) =>
+
+            index === polymerIndex
+              ? {
+
+                  ...polymer,
+
+                  monomers:
+                    polymer.monomers.filter(
+                      (_, i) =>
+                        i !== monomerIndex
+                    ),
+
+                }
+
+              : polymer
+        )
     );
   }
+
 
   /*
    * ================================
@@ -459,30 +715,41 @@ export function Simulator() {
     monomerIndex,
     name
   ) {
-    setPolymersConfig((current) =>
-      current.map(
-        (polymer, pIndex) =>
-          pIndex === polymerIndex
-            ? {
-                ...polymer,
 
-                monomers:
-                  polymer.monomers.map(
-                    (monomer, mIndex) =>
-                      mIndex === monomerIndex
-                        ? {
-                            ...monomer,
-                            name,
-                          }
+    setPolymersConfig(
+      (current) =>
 
-                        : monomer
-                  ),
-              }
+        current.map(
+          (polymer, pIndex) =>
 
-            : polymer
-      )
+            pIndex === polymerIndex
+              ? {
+
+                  ...polymer,
+
+                  monomers:
+                    polymer.monomers.map(
+                      (
+                        monomer,
+                        mIndex
+                      ) =>
+
+                        mIndex === monomerIndex
+                          ? {
+                              ...monomer,
+                              name,
+                            }
+
+                          : monomer
+                    ),
+
+                }
+
+              : polymer
+        )
     );
   }
+
 
   /*
    * ================================
@@ -495,16 +762,21 @@ export function Simulator() {
     monomerIndex,
     value
   ) {
+
     const key =
       `${polymerIndex}-${monomerIndex}`;
 
-    setDomainInputs((current) => ({
-      ...current,
-      [key]: value,
-    }));
+    setDomainInputs(
+      (current) => ({
+        ...current,
+        [key]: value,
+      })
+    );
 
     try {
-      const domains = JSON.parse(value);
+
+      const domains =
+        JSON.parse(value);
 
       if (
         domains === null ||
@@ -514,34 +786,45 @@ export function Simulator() {
         return;
       }
 
-      setPolymersConfig((current) =>
-        current.map(
-          (polymer, pIndex) =>
-            pIndex === polymerIndex
-              ? {
-                  ...polymer,
+      setPolymersConfig(
+        (current) =>
 
-                  monomers:
-                    polymer.monomers.map(
-                      (monomer, mIndex) =>
-                        mIndex === monomerIndex
-                          ? {
-                              ...monomer,
-                              domains,
-                            }
+          current.map(
+            (polymer, pIndex) =>
 
-                          : monomer
-                    ),
-                }
+              pIndex === polymerIndex
+                ? {
 
-              : polymer
-        )
+                    ...polymer,
+
+                    monomers:
+                      polymer.monomers.map(
+                        (
+                          monomer,
+                          mIndex
+                        ) =>
+
+                          mIndex === monomerIndex
+                            ? {
+                                ...monomer,
+                                domains,
+                              }
+
+                            : monomer
+                      ),
+
+                  }
+
+                : polymer
+          )
       );
+
     }
     catch {
       // Invalid JSON while typing.
     }
   }
+
 
   /*
    * ================================
@@ -559,6 +842,7 @@ export function Simulator() {
       ? simulation.validSplits()
       : [];
 
+
   /*
    * ================================
    * CURRENT POLYMERS
@@ -570,7 +854,9 @@ export function Simulator() {
       ? [...simulation.polymers.values()]
       : [];
 
+
   return (
+
     <div className="app">
 
       {/* =========================
@@ -612,17 +898,20 @@ export function Simulator() {
 
       </header>
 
+
       {/* =========================
           MAIN
       ========================== */}
 
       <main className="layout">
 
+
         {/* =======================
             SIDEBAR
         ======================== */}
 
         <aside className="sidebar">
+
 
           {/* MODEL */}
 
@@ -661,6 +950,7 @@ export function Simulator() {
 
             </label>
 
+
             <label>
 
               w
@@ -677,6 +967,7 @@ export function Simulator() {
               />
 
             </label>
+
 
             {model === "threshold" && (
 
@@ -698,6 +989,7 @@ export function Simulator() {
               </label>
 
             )}
+
 
             {model === "barrier" && (
 
@@ -721,6 +1013,7 @@ export function Simulator() {
             )}
 
           </section>
+
 
           {/* =======================
               INITIAL CONFIGURATION
@@ -758,6 +1051,7 @@ export function Simulator() {
 
               </button>
 
+
               {initialConfigOpen && (
 
                 <button
@@ -770,6 +1064,7 @@ export function Simulator() {
               )}
 
             </div>
+
 
             {initialConfigOpen && (
 
@@ -808,6 +1103,7 @@ export function Simulator() {
 
                         </div>
 
+
                         <button
                           className="delete-button"
                           onClick={() =>
@@ -820,6 +1116,7 @@ export function Simulator() {
                         </button>
 
                       </div>
+
 
                       <div className="monomer-cards">
 
@@ -857,6 +1154,7 @@ export function Simulator() {
                                   }
                                 />
 
+
                                 <input
                                   className="domains-input"
                                   value={
@@ -878,6 +1176,7 @@ export function Simulator() {
                                   }
                                 />
 
+
                                 <button
                                   className="delete-button"
                                   onClick={() =>
@@ -897,6 +1196,7 @@ export function Simulator() {
                         )}
 
                       </div>
+
 
                       <button
                         className="add-monomer"
@@ -918,6 +1218,7 @@ export function Simulator() {
 
             )}
 
+
             <div className="configuration-actions">
 
               <button
@@ -928,6 +1229,7 @@ export function Simulator() {
               >
                 Initialize Simulation
               </button>
+
 
               <button
                 className="secondary-button"
@@ -941,6 +1243,7 @@ export function Simulator() {
             </div>
 
           </section>
+
 
           {/* =======================
               JSON CONFIGURATION
@@ -980,6 +1283,7 @@ export function Simulator() {
 
             </div>
 
+
             {jsonConfigOpen && (
 
               <div className="json-configuration">
@@ -988,18 +1292,26 @@ export function Simulator() {
                   Initial Configuration JSON
                 </label>
 
+
                 <textarea
-                  value={configurationJson}
+                  value={
+                    configurationJson
+                  }
                   onChange={(event) => {
+
                     setConfigurationJson(
                       event.target.value
                     );
 
-                    setConfigurationJsonError("");
+                    setConfigurationJsonError(
+                      ""
+                    );
+
                   }}
                   rows={12}
                   spellCheck={false}
                 />
+
 
                 {configurationJsonError && (
 
@@ -1008,6 +1320,7 @@ export function Simulator() {
                   </div>
 
                 )}
+
 
                 <button
                   className="secondary-button"
@@ -1024,6 +1337,7 @@ export function Simulator() {
 
           </section>
 
+
           {/* =======================
               SIMULATION CONTROLS
           ======================== */}
@@ -1035,6 +1349,7 @@ export function Simulator() {
               <h2>
                 Simulation
               </h2>
+
 
               <div className="move-count">
 
@@ -1048,6 +1363,7 @@ export function Simulator() {
 
               </div>
 
+
               <div className="move-count">
 
                 <span>
@@ -1059,6 +1375,7 @@ export function Simulator() {
                 </strong>
 
               </div>
+
 
               <div className="move-count">
 
@@ -1072,9 +1389,12 @@ export function Simulator() {
 
               </div>
 
+
               <button
                 className="primary-button"
-                onClick={randomStep}
+                onClick={
+                  randomStep
+                }
               >
                 Random Step
               </button>
@@ -1083,7 +1403,225 @@ export function Simulator() {
 
           )}
 
+
+          {/* =======================
+              POLYMER COMPARISON
+          ======================== */}
+
+          {simulation &&
+            polymers.length >= 2 && (
+
+              <section className="panel">
+
+                <h2>
+                  Compare Polymers
+                </h2>
+
+
+                <label>
+
+                  Polymer 1
+
+                  <select
+                    value={
+                      comparePolymer1
+                    }
+                    onChange={(event) => {
+
+                      setComparePolymer1(
+                        event.target.value
+                      );
+
+                      setComparison(null);
+
+                    }}
+                  >
+
+                    <option value="">
+                      Select polymer
+                    </option>
+
+                    {polymers.map(
+                      (polymer) => (
+
+                        <option
+                          key={
+                            polymer.name
+                          }
+                          value={
+                            polymer.name
+                          }
+                        >
+                          {polymer.name}
+                        </option>
+
+                      )
+                    )}
+
+                  </select>
+
+                </label>
+
+
+                <label>
+
+                  Polymer 2
+
+                  <select
+                    value={
+                      comparePolymer2
+                    }
+                    onChange={(event) => {
+
+                      setComparePolymer2(
+                        event.target.value
+                      );
+
+                      setComparison(null);
+
+                    }}
+                  >
+
+                    <option value="">
+                      Select polymer
+                    </option>
+
+                    {polymers.map(
+                      (polymer) => (
+
+                        <option
+                          key={
+                            polymer.name
+                          }
+                          value={
+                            polymer.name
+                          }
+                        >
+                          {polymer.name}
+                        </option>
+
+                      )
+                    )}
+
+                  </select>
+
+                </label>
+
+
+                <button
+                  className="primary-button"
+                  disabled={
+                    !comparePolymer1 ||
+                    !comparePolymer2 ||
+                    comparePolymer1 ===
+                      comparePolymer2
+                  }
+                  onClick={
+                    compareSelectedPolymers
+                  }
+                >
+                  Compare
+                </button>
+
+
+                {comparison && (
+
+                  <div className="comparison-result">
+
+                    <div className="move-count">
+
+                      <span>
+                        Polymers
+                      </span>
+
+                      <strong>
+                        {
+                          comparison
+                            .polymers[0]
+                            .name
+                        }
+                        {" + "}
+                        {
+                          comparison
+                            .polymers[1]
+                            .name
+                        }
+                      </strong>
+
+                    </div>
+
+
+                    <div className="move-count">
+
+                      <span>
+                        Shared bonds
+                      </span>
+
+                      <strong>
+                        {
+                          comparison
+                            .total_bonds
+                        }
+                      </strong>
+
+                    </div>
+
+
+                    {comparison.shared_bonds.size > 0 ? (
+
+                      <div className="shared-bonds">
+
+                        <strong>
+                          Bonds by domain
+                        </strong>
+
+
+                        {[...
+                          comparison
+                            .shared_bonds
+                        ].map(
+                          (
+                            [domain, bonds]
+                          ) => (
+
+                            <div
+                              className="move-count"
+                              key={domain}
+                            >
+
+                              <span>
+                                {domain}
+                              </span>
+
+                              <strong>
+                                {bonds}
+                              </strong>
+
+                            </div>
+
+                          )
+                        )}
+
+                      </div>
+
+                    ) : (
+
+                      <div className="no-moves">
+                        No shared bonds.
+                      </div>
+
+                    )}
+
+                  </div>
+
+                )}
+
+              </section>
+
+            )}
+
         </aside>
+
 
         {/* =======================
             BOARD
@@ -1109,12 +1647,15 @@ export function Simulator() {
 
             </div>
 
+
             {simulation && (
 
               <div className="toolbar-buttons">
 
                 <button
-                  onClick={randomStep}
+                  onClick={
+                    randomStep
+                  }
                 >
                   Step
                 </button>
@@ -1125,6 +1666,7 @@ export function Simulator() {
 
           </div>
 
+
           {simulation && (
 
             <div className="board">
@@ -1133,8 +1675,12 @@ export function Simulator() {
                 (polymer) => (
 
                   <PolymerView
-                    key={polymer.name}
-                    polymer={polymer}
+                    key={
+                      polymer.name
+                    }
+                    polymer={
+                      polymer
+                    }
                   />
 
                 )
@@ -1148,6 +1694,7 @@ export function Simulator() {
 
       </main>
 
+
       {/* =========================
           VALID MOVES
       ========================== */}
@@ -1160,7 +1707,9 @@ export function Simulator() {
             Valid Transitions
           </h2>
 
+
           <div className="move-list">
+
 
             {/* MERGES */}
 
@@ -1173,13 +1722,16 @@ export function Simulator() {
                 const [
                   polymer1,
                   polymer2
-                ] = merge.polymers;
+                ] =
+                  merge.polymers;
 
                 return (
 
                   <button
                     className="move-card"
-                    key={`merge-${index}`}
+                    key={
+                      `merge-${index}`
+                    }
                     onClick={() =>
                       executeMerge(
                         polymer1,
@@ -1201,8 +1753,10 @@ export function Simulator() {
                   </button>
 
                 );
+
               }
             )}
+
 
             {/* SPLITS */}
 
@@ -1222,7 +1776,9 @@ export function Simulator() {
 
                   <button
                     className="move-card"
-                    key={`split-${index}`}
+                    key={
+                      `split-${index}`
+                    }
                     onClick={() =>
                       executeSplit(
                         polymer,
@@ -1236,6 +1792,7 @@ export function Simulator() {
                     </span>
 
                     <span>
+
                       {polymer.name}
                       {" → "}
 
@@ -1245,13 +1802,16 @@ export function Simulator() {
                             monomer.name
                         )
                         .join(", ")}
+
                     </span>
 
                   </button>
 
                 );
+
               }
             )}
+
 
             {/* NO MOVES */}
 
@@ -1274,13 +1834,17 @@ export function Simulator() {
   );
 }
 
+
 /* =================================
    POLYMER VIEW
 ================================= */
 
-function PolymerView({ polymer }) {
+function PolymerView({
+  polymer
+}) {
 
   return (
+
     <div className="card polymer-card">
 
       <div className="card-header polymer-card-header">
@@ -1292,55 +1856,78 @@ function PolymerView({ polymer }) {
           </h5>
 
           <small className="text-muted">
+
             {polymer.monomers.size}{" "}
+
             {polymer.monomers.size === 1
               ? "monomer"
               : "monomers"}
+
           </small>
 
         </div>
 
       </div>
 
+
       <div className="card-body">
 
         <div className="polymers">
-          {[...polymer.monomers.values()].map(
+
+          {[...
+            polymer.monomers.values()
+          ].map(
             (monomer) => (
 
               <MonomerView
-                key={monomer.name}
-                monomer={monomer}
+                key={
+                  monomer.name
+                }
+                monomer={
+                  monomer
+                }
               />
 
             )
           )}
+
         </div>
+
       </div>
 
     </div>
   );
 }
 
+
 /* =================================
    MONOMER VIEW
 ================================= */
 
-function MonomerView({ monomer }) {
+function MonomerView({
+  monomer
+}) {
 
   return (
+
     <div className="card monomer-card">
 
       <div className="card-body">
 
         <div className="domains">
 
-          {[...monomer.domains].map(
-            ([domain, quantity]) => {
+          {[...
+            monomer.domains
+          ].map(
+            (
+              [domain, quantity]
+            ) => {
 
-              const amount = Number(quantity);
+              const amount =
+                Number(quantity);
 
               return (
+
                 <div
                   className={`domain ${
                     amount >= 0
@@ -1361,11 +1948,13 @@ function MonomerView({ monomer }) {
                   </strong>
 
                 </div>
+
               );
             }
           )}
 
         </div>
+
 
         <div className="monomer-name">
           {monomer.name}
