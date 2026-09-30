@@ -565,7 +565,7 @@ button {
 
     width: auto;
 
-    margin-top: 0;
+    margin: 0;
 }
 
 .configuration-actions .secondary-button {
@@ -578,7 +578,21 @@ button {
 
     margin-top: 0;
 }
+.simulation-actions {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 2px;
+}
 
+.simulation-actions .primary-button {
+    flex: 1;
+    width: fill;
+}
+
+.simulation-actions .secondary-button {
+    width: fill;
+}
 
 /* ------------------------------
    Move Counters
@@ -601,10 +615,6 @@ button {
     border-radius: 20px;
 
     background: #eee;
-}
-
-.sidebar .primary-button {
-    margin-top: 10px;
 }
 
 
@@ -873,35 +883,53 @@ button {
    Valid Moves
 ------------------------------ */
 
+/* ------------------------------
+   Valid Moves
+------------------------------ */
+
 .moves-panel {
-    padding: 20px 28px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+
+    padding: 12px 28px;
+    gap: 20px;
 
     background: white;
-
     border-top: 1px solid #ddd;
+
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .moves-panel h2 {
-    margin: 0 0 12px;
+    flex-shrink: 0;
+
+    margin: 0;
 
     font-size: 15px;
 }
 
 .move-list {
-    display: flex;
+    flex: 1;
 
+    display: flex;
+    align-items: center;
     flex-wrap: wrap;
 
     gap: 8px;
 
-    max-height: 170px;
-
+    max-height: 60px;
     overflow-y: auto;
 }
 
 .move-card {
     display: flex;
-
     align-items: center;
 
     gap: 10px;
@@ -914,6 +942,9 @@ button {
     background: white;
 
     font-size: 12px;
+
+    cursor: pointer;
+    white-space: nowrap;
 }
 
 .move-card:hover {
@@ -941,10 +972,8 @@ button {
 
 .no-moves {
     color: #777;
-
     font-size: 13px;
 }
-
 
 /* ------------------------------
    Collapsible Panel

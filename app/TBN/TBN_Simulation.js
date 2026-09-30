@@ -19,11 +19,11 @@ export class TBN_Simulation {
     }
 
 
-    createPolymer(monomers = []) {
-
-        const name = `P${this.next_polymer_id}`;
-
-        this.next_polymer_id++;
+    createPolymer(monomers = [], name = null) {
+        if(!name){
+            name = `P${this.next_polymer_id}`;
+            this.next_polymer_id++;
+        }
 
         const polymer =
             new TBN_Simulation.Polymer(
@@ -256,6 +256,7 @@ export class TBN_Simulation {
             total_bonds
         };
     }
+    
     merge(polymer1, polymer2) {
 
         const receipt = this.energy_change("merge", [polymer1, polymer2]);
@@ -288,7 +289,6 @@ export class TBN_Simulation {
         for (let i = 0; i < polymers.length; i++) {
 
             const polymer_i = polymers[i];
-
 
             for (let j = i + 1; j < polymers.length; j++) {
 
@@ -386,7 +386,7 @@ export class TBN_Simulation {
     }
 
 
-    split(polymer, split_monomers) {
+    split(polymer, split_monomers,name = null) {
 
         const receipt = this.energy_change("split", [polymer], split_monomers);
 
@@ -397,7 +397,7 @@ export class TBN_Simulation {
             );
 
 
-        const new_polymer = this.createPolymer(split_monomers);
+        const new_polymer = this.createPolymer(split_monomers, name);
 
 
         for (const monomer of split_monomers) {
@@ -562,10 +562,7 @@ export class TBN_Simulation {
 
 TBN_Simulation.Polymer = class {
 
-    constructor(
-        simulation,
-        name = ""
-    ) {
+    constructor(simulation, name = "") {
 
         this.simulation = simulation;
         this.name = name;
@@ -575,10 +572,7 @@ TBN_Simulation.Polymer = class {
     }
 
 
-    createMonomer(
-        name = "",
-        domains = {}
-    ) {
+    createMonomer(name = "", domains = {}) {
 
         const monomer =
             new TBN_Simulation.Polymer.Monomer(
@@ -588,18 +582,13 @@ TBN_Simulation.Polymer = class {
             );
 
 
-        this.addMonomer(
-            monomer
-        );
-
+        this.addMonomer(monomer);
 
         return monomer;
     }
 
 
-    addMonomer(
-        monomer
-    ) {
+    addMonomer(monomer) {
 
         this.monomers.set(
             monomer.name,
@@ -607,8 +596,7 @@ TBN_Simulation.Polymer = class {
         );
 
 
-        monomer.polymer =
-            this;
+        monomer.polymer = this;
 
 
         for (const [domain, quantity] of monomer.domains) {
@@ -620,12 +608,10 @@ TBN_Simulation.Polymer = class {
                 };
 
 
-            entry.aggregate +=
-                quantity;
+            entry.aggregate += quantity;
 
 
-            entry.count +=
-                Math.abs(quantity);
+            entry.count += Math.abs(quantity);
 
 
             this.domain_table.set(
@@ -643,11 +629,7 @@ TBN_Simulation.Polymer = class {
 
 TBN_Simulation.Polymer.Monomer = class {
 
-    constructor(
-        polymer,
-        name = "",
-        domains = new Map()
-    ) {
+    constructor(polymer, name = "", domains = new Map()) {
 
         this.polymer = polymer;
         this.name = name;

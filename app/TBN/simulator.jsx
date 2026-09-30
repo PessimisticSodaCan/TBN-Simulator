@@ -61,23 +61,17 @@ export function Simulator() {
   const [threshold, setThreshold] = useState("0");
   const [barrier, setBarrier] = useState("0");
 
-  const [polymersConfig, setPolymersConfig] =
-    useState(DEFAULT_CONFIG["initial config"]);
+  const [polymersConfig, setPolymersConfig] = useState(DEFAULT_CONFIG["initial config"]);
 
-  const [initialConfigOpen, setInitialConfigOpen] =
-    useState(true);
+  const [initialConfigOpen, setInitialConfigOpen] = useState(true);
 
-  const [jsonConfigOpen, setJsonConfigOpen] =
-    useState(false);
+  const [lastMove, setLastMove] = useState(null);
 
-  const [domainInputs, setDomainInputs] =
-    useState({});
+  const [jsonConfigOpen, setJsonConfigOpen] = useState(false);
 
-  const [simulation, setSimulation] =
-    useState(null);
+  const [domainInputs, setDomainInputs] = useState({});
 
-  const [, setMoveVersion] =
-    useState(0);
+  const [simulation, setSimulation] = useState(null);
 
   const [configurationJson, setConfigurationJson] =
     useState(
@@ -97,14 +91,11 @@ export function Simulator() {
    * ================================
    */
 
-  const [comparePolymer1, setComparePolymer1] =
-    useState("");
+  const [comparePolymer1, setComparePolymer1] = useState("");
 
-  const [comparePolymer2, setComparePolymer2] =
-    useState("");
+  const [comparePolymer2, setComparePolymer2] = useState("");
 
-  const [comparison, setComparison] =
-    useState(null);
+  const [comparison, setComparison] = useState(null);
 
 
   /*
@@ -191,59 +182,33 @@ export function Simulator() {
         }
       }
 
-      const initialConfig =
-        configuration["initial config"];
+      const initialConfig = configuration["initial config"];
 
-      if (
-        !Array.isArray(initialConfig)
-      ) {
+      if (!Array.isArray(initialConfig)) {
         throw new Error(
           '"initial config" must be an array of polymers.'
         );
       }
 
-      for (
-        const polymer of initialConfig
-      ) {
+      for (const polymer of initialConfig) {
 
-        if (
-          typeof polymer !== "object" ||
-          polymer === null ||
-          typeof polymer.name !== "string" ||
-          !Array.isArray(polymer.monomers)
-        ) {
+        if (typeof polymer !== "object" || polymer === null || typeof polymer.name !== "string" || !Array.isArray(polymer.monomers)) {
           throw new Error(
             "Each polymer must have a name and monomers array."
           );
         }
 
-        for (
-          const monomer of polymer.monomers
-        ) {
+        for (const monomer of polymer.monomers) {
 
-          if (
-            typeof monomer !== "object" ||
-            monomer === null ||
-            typeof monomer.name !== "string" ||
-            typeof monomer.domains !== "object" ||
-            monomer.domains === null ||
-            Array.isArray(monomer.domains)
-          ) {
+          if (typeof monomer !== "object" || monomer === null || typeof monomer.name !== "string" || typeof monomer.domains !== "object" || monomer.domains === null || Array.isArray(monomer.domains)) {
             throw new Error(
               "Each monomer must have a name and domains object."
             );
           }
 
-          for (
-            const quantity of Object.values(
-              monomer.domains
-            )
-          ) {
+          for (const quantity of Object.values(monomer.domains)) {
 
-            if (
-              typeof quantity !== "number" ||
-              !Number.isFinite(quantity)
-            ) {
+            if (typeof quantity !== "number" || !Number.isFinite(quantity)) {
               throw new Error(
                 "Domain quantities must be numbers."
               );
@@ -252,33 +217,19 @@ export function Simulator() {
         }
       }
 
-      setModel(
-        configuration.model
-      );
+      setModel(configuration.model);
 
-      setW(
-        String(configuration.w)
-      );
+      setW(String(configuration.w));
 
-      if (
-        configuration.model === "threshold"
-      ) {
-        setThreshold(
-          String(configuration.threshold)
-        );
+      if (configuration.model === "threshold") {
+        setThreshold(String(configuration.threshold));
       }
 
-      if (
-        configuration.model === "barrier"
-      ) {
-        setBarrier(
-          String(configuration.barrier)
-        );
+      if (configuration.model === "barrier") {
+        setBarrier(String(configuration.barrier));
       }
 
-      setPolymersConfig(
-        initialConfig
-      );
+      setPolymersConfig(initialConfig);
 
       setInitialConfigOpen(false);
 
@@ -322,9 +273,7 @@ export function Simulator() {
       const polymer =
         sim.createPolymer();
 
-      for (
-        const monomerData of polymerData.monomers
-      ) {
+      for (const monomerData of polymerData.monomers) {
 
         const domains =
           new Map(
@@ -340,8 +289,7 @@ export function Simulator() {
       }
     }
 
-    sim.energy =
-      sim.calculate_energy();
+    sim.energy = sim.calculate_energy();
 
     setConfigurationJson(
       JSON.stringify(
@@ -352,14 +300,8 @@ export function Simulator() {
     );
 
     setSimulation(sim);
-
-    setComparePolymer1("");
-    setComparePolymer2("");
-    setComparison(null);
-
-    setMoveVersion(
-      (v) => v + 1
-    );
+    setInitialConfigOpen(false)
+ 
   }
 
 
@@ -377,9 +319,7 @@ export function Simulator() {
     setComparePolymer2("");
     setComparison(null);
 
-    setMoveVersion(
-      (v) => v + 1
-    );
+ 
   }
 
 
@@ -391,79 +331,8 @@ export function Simulator() {
 
   function randomStep() {
 
-    if (!simulation) {
-      return;
-    }
-
-    const merges =
-      simulation.validMerges();
-
-    const splits =
-      simulation.validSplits();
-
-    const possibleMoves = [
-
-      ...merges.map(
-        (merge) => ({
-          type: "merge",
-          polymer1:
-            merge.polymers[0],
-          polymer2:
-            merge.polymers[1],
-        })
-      ),
-
-      ...splits.map(
-        (split) => ({
-          type: "split",
-          polymer:
-            split.polymer,
-          splitMonomers:
-            split.split_monomers,
-        })
-      ),
-
-    ];
-
-    if (
-      possibleMoves.length === 0
-    ) {
-      return;
-    }
-
-    const move =
-      possibleMoves[
-        Math.floor(
-          Math.random() *
-          possibleMoves.length
-        )
-      ];
-
-    if (
-      move.type === "merge"
-    ) {
-
-      simulation.merge(
-        move.polymer1,
-        move.polymer2
-      );
-    }
-
-    if (
-      move.type === "split"
-    ) {
-
-      simulation.split(
-        move.polymer,
-        move.splitMonomers
-      );
-    }
-
     setComparison(null);
-
-    setMoveVersion(
-      (v) => v + 1
-    );
+ 
   }
 
 
@@ -473,10 +342,7 @@ export function Simulator() {
    * ================================
    */
 
-  function executeMerge(
-    polymer1,
-    polymer2
-  ) {
+  function executeMerge(polymer1, polymer2) {
 
     if (!simulation) {
       return;
@@ -488,10 +354,13 @@ export function Simulator() {
     );
 
     setComparison(null);
-
-    setMoveVersion(
-      (v) => v + 1
-    );
+    setLastMove({
+        "type":"merge",
+        polymer1,
+        polymer2
+      }
+    )
+ 
   }
 
 
@@ -510,18 +379,36 @@ export function Simulator() {
       return;
     }
 
-    simulation.split(
-      polymer,
-      splitMonomers
-    );
+    const polymer2 = simulation.split(polymer, splitMonomers);
+
+    setLastMove({
+        "type":"split",
+        "polymer1": polymer,
+        polymer2
+      }
+    )
 
     setComparison(null);
 
-    setMoveVersion(
-      (v) => v + 1
-    );
+ 
   }
+  /*
+   * ================================
+   * Undo Last Move
+   * ================================
+   */
 
+  function undo(){
+    if(lastMove.type == 'merge'){
+      simulation.split(lastMove.polymer1, [...lastMove.polymer2.monomers.values()], lastMove.polymer2.name)
+    }
+    else{
+      simulation.merge(lastMove.polymer1, lastMove.polymer2);
+    }
+
+    setLastMove(null);
+    setComparison(null);
+  }
 
   /*
    * ================================
@@ -535,15 +422,9 @@ export function Simulator() {
       return;
     }
 
-    const polymer1 =
-      simulation.polymers.get(
-        comparePolymer1
-      );
+    const polymer1 = simulation.polymers.get(comparePolymer1);
 
-    const polymer2 =
-      simulation.polymers.get(
-        comparePolymer2
-      );
+    const polymer2 = simulation.polymers.get(comparePolymer2);
 
     if (
       !polymer1 ||
@@ -1388,16 +1269,24 @@ export function Simulator() {
                 </strong>
 
               </div>
+              
+              <div className="simulation-actions">
+                <button
+                  className="primary-button"
+                  onClick={randomStep}
+                >
+                  Random Step
+                </button>
 
+                <button
+                  className="secondary-button"
+                  onClick={undo}
+                  disabled={!lastMove}
+                >
+                  Undo
+                </button>
+              </div>
 
-              <button
-                className="primary-button"
-                onClick={
-                  randomStep
-                }
-              >
-                Random Step
-              </button>
 
             </section>
 
@@ -1713,17 +1602,9 @@ export function Simulator() {
 
             {/* MERGES */}
 
-            {merges.map(
-              (
-                merge,
-                index
-              ) => {
+            {merges.map((merge,index) => {
 
-                const [
-                  polymer1,
-                  polymer2
-                ] =
-                  merge.polymers;
+                const [polymer1, polymer2] = merge.polymers;
 
                 return (
 
@@ -1733,10 +1614,7 @@ export function Simulator() {
                       `merge-${index}`
                     }
                     onClick={() =>
-                      executeMerge(
-                        polymer1,
-                        polymer2
-                      )
+                      executeMerge(polymer1, polymer2)
                     }
                   >
 
@@ -1760,17 +1638,11 @@ export function Simulator() {
 
             {/* SPLITS */}
 
-            {splits.map(
-              (
-                split,
-                index
-              ) => {
+            {splits.map((split, index) => {
 
-                const polymer =
-                  split.polymer;
+                const polymer = split.polymer;
 
-                const splitMonomers =
-                  split.split_monomers;
+                const splitMonomers = split.split_monomers;
 
                 return (
 
